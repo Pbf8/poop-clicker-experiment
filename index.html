@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Daily Drop 💩</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* --- CSS STYLING --- */
+        :root {
+            --glass: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --text-color: #ffffff;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            color: var(--text-color);
+        }
+
+        /* Full Screen Background */
+        .bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            /* Nice abstract/nature background */
+            background: url('https://images.unsplash.com/photo-1518837695005-2083093ee35b?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
+            filter: brightness(0.6);
+            z-index: -1;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+
+        /* The Button */
+        .poop-btn {
+            font-size: 8rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.1s ease, filter 0.2s;
+            user-select: none;
+            filter: drop-shadow(0 0 15px rgba(0,0,0,0.5));
+        }
+
+        .poop-btn:active {
+            transform: scale(0.9);
+        }
+
+        .poop-btn:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 25px rgba(255,255,255,0.4));
+        }
+
+        .poop-btn.disabled {
+            filter: grayscale(1) opacity(0.5);
+            cursor: not-allowed;
+        }
+
+        /* Counters container */
+        .stats-box {
+            margin-top: 40px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .counter-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            border-radius: 12px;
+            min-width: 140px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .counter-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
+        }
+
+        .count-val {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        /* Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1;
+            bottom: 30px;
+            font-size: 17px;
+        }
+
+        #toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    </style>
+</head>
+<body>
+
+    <div class="bg"></div>
+
+    <div class="container">
+        <button id="the-button" class="poop-btn" title="Drop one">💩</button>
+
+        <div class="stats-box">
+            <div class="counter-card">
+                <h3>Global Today</h3>
+                <div id="daily-count" class="count-val">...</div>
+            </div>
+            <div class="counter-card">
+                <h3>Eternal Total</h3>
+                <div id="eternal-count" class="count-val">...</div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="sound-success" src="https://www.soundjay.com/misc/sounds/bubble-burst-1.mp3"></audio>
+    <audio id="sound-error" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+
+    <div id="toast">Wait! You must hold it in.</div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const SUPABASE_URL = 'https://tiygrgsdcbplliehxogu.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_kPH335oqP4jqVf8hZUgWiw_i_1hgWJ7';
+        
+        const TABLE_NAME = 'clicks';
+        const COOLDOWN_HOURS = 2;
+        
+        // Inizializza Supabase
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Elementi DOM
+        const btn = document.getElementById('the-button');
+        const dailyEl = document.getElementById('daily-count');
+        const eternalEl = document.getElementById('eternal-count');
+        const soundSuccess = document.getElementById('sound-success');
+        const soundError = document.getElementById('sound-error');
+        const toast = document.getElementById('toast');
+
+        // --- 1. DISPLAY IMMEDIATO (Cache Locale) ---
+        // Al caricamento, mostriamo subito i numeri salvati l'ultima volta
+        // così l'utente non vede mai "..."
+        function initDisplay() {
+            const savedDaily = localStorage.getItem('poop_cache_daily');
+            const savedEternal = localStorage.getItem('poop_cache_eternal');
+
+            if (savedDaily) dailyEl.innerText = savedDaily;
+            else dailyEl.innerText = "0";
+
+            if (savedEternal) eternalEl.innerText = savedEternal;
+            else eternalEl.innerText = "0";
+        }
+
+        // --- 2. LOGICA DB (Fetch & Update) ---
+        async function fetchCounts() {
+            // A. Eternal Count
+            const { count: eternalCount, error: err1 } = await _supabase
+                .from(TABLE_NAME)
+                .select('*', { count: 'exact', head: true });
+
+            // B. Daily Count (Da mezzanotte UTC)
+            const now = new Date();
+            const startOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+            
+            const { count: dailyCount, error: err2 } = await _supabase
+                .from(TABLE_NAME)
+                .select('*', { count: 'exact', head: true })
+                .gte('created_at', startOfDay.toISOString());
+
+            // Aggiorna UI e Cache se non ci sono errori
+            if (!err1 && eternalCount !== null) {
+                eternalEl.innerText = eternalCount;
+                localStorage.setItem('poop_cache_eternal', eternalCount);
+            }
+            if (!err2 && dailyCount !== null) {
+                dailyEl.innerText = dailyCount;
+                localStorage.setItem('poop_cache_daily', dailyCount);
+            }
+        }
+
+        // --- 3. REALTIME (Magia Pura) ---
+        // Ascolta se qualcun altro nel mondo clicca e aggiorna subito
+        function subscribeToClicks() {
+            _supabase
+                .channel('public:clicks')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: TABLE_NAME }, (payload) => {
+                    // Quando arriva un nuovo click da chiunque:
+                    // 1. Aumenta il contatore eterno visivamente
+                    let currentEternal = parseInt(eternalEl.innerText || 0);
+                    eternalEl.innerText = currentEternal + 1;
+
+                    // 2. Aumenta il giornaliero visivamente
+                    let currentDaily = parseInt(dailyEl.innerText || 0);
+                    dailyEl.innerText = currentDaily + 1;
+                    
+                    // Nota: Ogni tanto facciamo un fetch reale per sicurezza
+                })
+                .subscribe();
+        }
+
+        // --- 4. LOGICA CLICK ---
+        function checkCooldown() {
+            const lastClickStr = localStorage.getItem('poop_last_click');
+            if (!lastClickStr) return true;
+
+            const lastClick = parseInt(lastClickStr);
+            const now = Date.now();
+            const diff = now - lastClick;
+            const cooldownMs = COOLDOWN_HOURS * 60 * 60 * 1000;
+
+            if (diff < cooldownMs) {
+                const remainingMin = Math.ceil((cooldownMs - diff) / 60000);
+                return remainingMin;
+            }
+            return true;
+        }
+
+        function showToast(message) {
+            toast.innerText = message;
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        btn.addEventListener('click', async () => {
+            const allowed = checkCooldown();
+
+            if (allowed === true) {
+                // SUCCESS
+                soundSuccess.currentTime = 0;
+                soundSuccess.play();
+
+                // Aggiornamento Ottimistico (Immediato)
+                // Nota: Il Realtime lo aggiornerebbe comunque, ma così è istantaneo per chi clicca
+                const newDaily = parseInt(dailyEl.innerText || 0) + 1;
+                const newEternal = parseInt(eternalEl.innerText || 0) + 1;
+                dailyEl.innerText = newDaily;
+                eternalEl.innerText = newEternal;
+
+                // Salva Timestamp
+                localStorage.setItem('poop_last_click', Date.now().toString());
+                // Salva Cache Numeri
+                localStorage.setItem('poop_cache_daily', newDaily);
+                localStorage.setItem('poop_cache_eternal', newEternal);
+
+                // Invia a DB
+                await _supabase.from(TABLE_NAME).insert({});
+                
+                // Animazione bottone
+                btn.style.transform = "scale(0.9)";
+                setTimeout(() => btn.style.transform = "scale(1)", 150);
+
+            } else {
+                // BLOCKED
+                soundError.currentTime = 0;
+                soundError.play();
+                
+                // Shake animation
+                btn.style.transform = "translateX(10px)";
+                setTimeout(() => btn.style.transform = "translateX(-10px)", 100);
+                setTimeout(() => btn.style.transform = "translateX(0)", 200);
+
+                showToast(`Aspetta! Devi tenerla per altri ${allowed} minuti.`);
+            }
+        });
+
+        // --- INIZIALIZZAZIONE ---
+        initDisplay();       // 1. Mostra subito la cache (zero ritardo visivo)
+        fetchCounts();       // 2. Scarica i dati veri aggiornati
+        subscribeToClicks(); // 3. Attiva il canale live
+        
+        // Polling di sicurezza ogni 60 secondi (in caso il realtime perda un colpo)
+        setInterval(fetchCounts, 60000);
+
+    </script>
+</body>
+</html>
