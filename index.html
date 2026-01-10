@@ -130,11 +130,11 @@
         <div class="stats-box">
             <div class="counter-card">
                 <h3>Global Today</h3>
-                <div id="daily-count" class="count-val">...</div>
+                <div id="daily-count" class="count-val">--</div>
             </div>
             <div class="counter-card">
                 <h3>Eternal Total</h3>
-                <div id="eternal-count" class="count-val">...</div>
+                <div id="eternal-count" class="count-val">--</div>
             </div>
         </div>
     </div>
@@ -145,7 +145,8 @@
     <div id="toast">Wait! You must hold it in.</div>
 
     <script>
-        // --- CONFIGURATION ---
+        // --- CONFIGURAZIONE ---
+        // Credenziali prese dal tuo file caricato
         const SUPABASE_URL = 'https://tiygrgsdcbplliehxogu.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_kPH335oqP4jqVf8hZUgWiw_i_1hgWJ7';
         
@@ -164,18 +165,17 @@
         const soundError = document.getElementById('sound-error');
         const toast = document.getElementById('toast');
 
+        // VARIABILE ANTI-DOPPIO CLICK
+        let isMyClick = false;
+
         // --- 1. DISPLAY IMMEDIATO (Cache Locale) ---
-        // Al caricamento, mostriamo subito i numeri salvati l'ultima volta
-        // così l'utente non vede mai "..."
         function initDisplay() {
             const savedDaily = localStorage.getItem('poop_cache_daily');
             const savedEternal = localStorage.getItem('poop_cache_eternal');
 
+            // Se abbiamo dati in cache li mostriamo, altrimenti lasciamo i trattini "--"
             if (savedDaily) dailyEl.innerText = savedDaily;
-            else dailyEl.innerText = "0";
-
             if (savedEternal) eternalEl.innerText = savedEternal;
-            else eternalEl.innerText = "0";
         }
 
         // --- 2. LOGICA DB (Fetch & Update) ---
@@ -205,22 +205,24 @@
             }
         }
 
-        // --- 3. REALTIME (Magia Pura) ---
-        // Ascolta se qualcun altro nel mondo clicca e aggiorna subito
+        // --- 3. REALTIME (Fix doppio conteggio integrato) ---
         function subscribeToClicks() {
             _supabase
                 .channel('public:clicks')
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: TABLE_NAME }, (payload) => {
-                    // Quando arriva un nuovo click da chiunque:
-                    // 1. Aumenta il contatore eterno visivamente
-                    let currentEternal = parseInt(eternalEl.innerText || 0);
+                    
+                    // SE È IL MIO CLICK (flag attivo), IGNORO L'AGGIORNAMENTO DAL SERVER
+                    if (isMyClick) {
+                        isMyClick = false; // Resetto il flag
+                        return; // Esco senza toccare i numeri
+                    }
+
+                    // SE È IL CLICK DI QUALCUN ALTRO, AGGIORNO
+                    let currentEternal = parseInt(eternalEl.innerText) || 0; // || 0 gestisce il caso "--"
                     eternalEl.innerText = currentEternal + 1;
 
-                    // 2. Aumenta il giornaliero visivamente
-                    let currentDaily = parseInt(dailyEl.innerText || 0);
+                    let currentDaily = parseInt(dailyEl.innerText) || 0;
                     dailyEl.innerText = currentDaily + 1;
-                    
-                    // Nota: Ogni tanto facciamo un fetch reale per sicurezza
                 })
                 .subscribe();
         }
@@ -256,10 +258,19 @@
                 soundSuccess.currentTime = 0;
                 soundSuccess.play();
 
-                // Aggiornamento Ottimistico (Immediato)
-                // Nota: Il Realtime lo aggiornerebbe comunque, ma così è istantaneo per chi clicca
-                const newDaily = parseInt(dailyEl.innerText || 0) + 1;
-                const newEternal = parseInt(eternalEl.innerText || 0) + 1;
+                // 1. ALZA LA BANDIERINA: "Sto per ricevere un eco dal server, ignoralo"
+                isMyClick = true;
+                // Sicurezza: resetta dopo 2 secondi in ogni caso
+                setTimeout(() => { isMyClick = false; }, 2000);
+
+                // 2. Aggiornamento Ottimistico (Immediato)
+                // Usiamo parseInt con fallback a 0 nel caso ci siano i trattini "--"
+                const currentDailyVal = parseInt(dailyEl.innerText) || 0;
+                const currentEternalVal = parseInt(eternalEl.innerText) || 0;
+
+                const newDaily = currentDailyVal + 1;
+                const newEternal = currentEternalVal + 1;
+                
                 dailyEl.innerText = newDaily;
                 eternalEl.innerText = newEternal;
 
@@ -291,11 +302,11 @@
         });
 
         // --- INIZIALIZZAZIONE ---
-        initDisplay();       // 1. Mostra subito la cache (zero ritardo visivo)
-        fetchCounts();       // 2. Scarica i dati veri aggiornati
-        subscribeToClicks(); // 3. Attiva il canale live
+        initDisplay();       // 1. Mostra cache o trattini
+        fetchCounts();       // 2. Scarica dati veri
+        subscribeToClicks(); // 3. Attiva realtime
         
-        // Polling di sicurezza ogni 60 secondi (in caso il realtime perda un colpo)
+        // Polling di sicurezza ogni 60 secondi
         setInterval(fetchCounts, 60000);
 
     </script>
