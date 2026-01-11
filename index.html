@@ -8,28 +8,23 @@
     <style>
         /* --- CSS STYLING --- */
         :root {
-            --glass: rgba(255, 255, 255, 0.15);
-            --glass-border: rgba(255, 255, 255, 0.3);
-            --text-color: #ffffff;
+            /* Nuovi colori "Rosa e Panna" */
+            --bg-pink: #ffdde1;
+            --bg-cream: #fff5e6;
+            --text-color: #5a3a3a; /* Testo marrone scuro per contrasto */
+            /* Vetro più chiaro per lo sfondo chiaro */
+            --glass: rgba(255, 255, 255, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.8);
         }
 
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', 'Arial', cursive, sans-serif; /* Font più giocoso */
             overflow: hidden;
             color: var(--text-color);
-        }
-
-        /* Full Screen Background */
-        .bg {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            /* Nice abstract/nature background */
-            background: url('https://images.unsplash.com/photo-1518837695005-2083093ee35b?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;
-            filter: brightness(0.6);
-            z-index: -1;
+            background: linear-gradient(to bottom, var(--bg-pink), var(--bg-cream));
         }
 
         .container {
@@ -39,36 +34,89 @@
             justify-content: center;
             height: 100%;
             text-align: center;
+            padding: 20px;
+        }
+
+        /* Hero Image sulla Landing Page */
+        .hero-image {
+            max-width: 250px;
+            height: auto;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));
+            border-radius: 20px;
+        }
+
+        /* --- IL FUMETTO E IL BOTTONE --- */
+        .button-wrapper {
+            position: relative;
+            margin: 40px 0;
+        }
+
+        /* Stile del Fumetto */
+        .speech-bubble {
+            position: absolute;
+            top: -90px; /* Posizione sopra la cacca */
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ffffff;
+            border: 4px solid #000;
+            border-radius: 25px;
+            padding: 15px 25px;
+            font-weight: bold;
+            font-size: 1.5rem;
+            white-space: nowrap;
+            z-index: 10;
+            box-shadow: 5px 5px 0 rgba(0,0,0,0.2);
+            color: #000;
+        }
+        
+        /* La "codina" del fumetto */
+        .speech-bubble:after, .speech-bubble:before {
+            top: 100%;
+            left: 50%;
+            border: solid transparent;
+            content: " ";
+            height: 0;
+            width: 0;
+            position: absolute;
+            pointer-events: none;
+        }
+        .speech-bubble:after {
+            border-color: rgba(255, 255, 255, 0);
+            border-top-color: #ffffff;
+            border-width: 15px;
+            margin-left: -15px;
+        }
+        .speech-bubble:before {
+            border-color: rgba(0, 0, 0, 0);
+            border-top-color: #000000;
+            border-width: 21px;
+            margin-left: -21px;
         }
 
         /* The Button */
         .poop-btn {
-            font-size: 8rem;
+            font-size: 9rem; /* Un po' più grande */
             background: none;
             border: none;
             cursor: pointer;
             transition: transform 0.1s ease, filter 0.2s;
             user-select: none;
-            filter: drop-shadow(0 0 15px rgba(0,0,0,0.5));
+            /* Ombra più morbida per lo sfondo chiaro */
+            filter: drop-shadow(0 10px 20px rgba(90, 58, 58, 0.3));
         }
 
         .poop-btn:active {
-            transform: scale(0.9);
+            transform: scale(0.9) rotate(-5deg);
         }
 
         .poop-btn:hover {
-            transform: scale(1.1);
-            filter: drop-shadow(0 0 25px rgba(255,255,255,0.4));
-        }
-
-        .poop-btn.disabled {
-            filter: grayscale(1) opacity(0.5);
-            cursor: not-allowed;
+            transform: scale(1.1) rotate(5deg);
         }
 
         /* Counters container */
         .stats-box {
-            margin-top: 40px;
+            margin-top: 30px;
             display: flex;
             gap: 20px;
         }
@@ -76,39 +124,41 @@
         .counter-card {
             background: var(--glass);
             backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            padding: 20px;
-            border-radius: 12px;
-            min-width: 140px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--glass-border);
+            padding: 15px 25px;
+            border-radius: 15px;
+            min-width: 120px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
         }
 
         .counter-card h3 {
-            margin: 0 0 10px 0;
-            font-size: 0.9rem;
+            margin: 0 0 5px 0;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0.8;
+            letter-spacing: 1px;
+            opacity: 0.7;
         }
 
         .count-val {
-            font-size: 2rem;
-            font-weight: bold;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #333;
         }
 
         /* Toast Notification */
         #toast {
             visibility: hidden;
             min-width: 250px;
-            background-color: #333;
+            background-color: #5a3a3a; /* Marrone */
             color: #fff;
             text-align: center;
-            border-radius: 4px;
+            border-radius: 10px;
             padding: 16px;
             position: fixed;
-            z-index: 1;
+            z-index: 100;
             bottom: 30px;
             font-size: 17px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         #toast.show {
@@ -122,10 +172,13 @@
 </head>
 <body>
 
-    <div class="bg"></div>
-
     <div class="container">
-        <button id="the-button" class="poop-btn" title="Drop one">💩</button>
+        <img src="https://cdn-icons-png.flaticon.com/512/2530/2530819.png" alt="Cute toilet roll" class="hero-image">
+
+        <div class="button-wrapper">
+            <div class="speech-bubble">Click me to poopoo!</div>
+            <button id="the-button" class="poop-btn" title="Drop one">💩</button>
+        </div>
 
         <div class="stats-box">
             <div class="counter-card">
@@ -146,7 +199,7 @@
 
     <script>
         // --- CONFIGURAZIONE ---
-        // Credenziali prese dal tuo file caricato
+        // LE TUE CREDENZIALI ORIGINALI
         const SUPABASE_URL = 'https://tiygrgsdcbplliehxogu.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_kPH335oqP4jqVf8hZUgWiw_i_1hgWJ7';
         
@@ -172,8 +225,6 @@
         function initDisplay() {
             const savedDaily = localStorage.getItem('poop_cache_daily');
             const savedEternal = localStorage.getItem('poop_cache_eternal');
-
-            // Se abbiamo dati in cache li mostriamo, altrimenti lasciamo i trattini "--"
             if (savedDaily) dailyEl.innerText = savedDaily;
             if (savedEternal) eternalEl.innerText = savedEternal;
         }
@@ -194,7 +245,6 @@
                 .select('*', { count: 'exact', head: true })
                 .gte('created_at', startOfDay.toISOString());
 
-            // Aggiorna UI e Cache se non ci sono errori
             if (!err1 && eternalCount !== null) {
                 eternalEl.innerText = eternalCount;
                 localStorage.setItem('poop_cache_eternal', eternalCount);
@@ -210,17 +260,12 @@
             _supabase
                 .channel('public:clicks')
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: TABLE_NAME }, (payload) => {
-                    
-                    // SE È IL MIO CLICK (flag attivo), IGNORO L'AGGIORNAMENTO DAL SERVER
                     if (isMyClick) {
-                        isMyClick = false; // Resetto il flag
-                        return; // Esco senza toccare i numeri
+                        isMyClick = false;
+                        return;
                     }
-
-                    // SE È IL CLICK DI QUALCUN ALTRO, AGGIORNO
-                    let currentEternal = parseInt(eternalEl.innerText) || 0; // || 0 gestisce il caso "--"
+                    let currentEternal = parseInt(eternalEl.innerText) || 0;
                     eternalEl.innerText = currentEternal + 1;
-
                     let currentDaily = parseInt(dailyEl.innerText) || 0;
                     dailyEl.innerText = currentDaily + 1;
                 })
@@ -258,41 +303,31 @@
                 soundSuccess.currentTime = 0;
                 soundSuccess.play();
 
-                // 1. ALZA LA BANDIERINA: "Sto per ricevere un eco dal server, ignoralo"
                 isMyClick = true;
-                // Sicurezza: resetta dopo 2 secondi in ogni caso
                 setTimeout(() => { isMyClick = false; }, 2000);
 
-                // 2. Aggiornamento Ottimistico (Immediato)
-                // Usiamo parseInt con fallback a 0 nel caso ci siano i trattini "--"
                 const currentDailyVal = parseInt(dailyEl.innerText) || 0;
                 const currentEternalVal = parseInt(eternalEl.innerText) || 0;
-
                 const newDaily = currentDailyVal + 1;
                 const newEternal = currentEternalVal + 1;
                 
                 dailyEl.innerText = newDaily;
                 eternalEl.innerText = newEternal;
 
-                // Salva Timestamp
                 localStorage.setItem('poop_last_click', Date.now().toString());
-                // Salva Cache Numeri
                 localStorage.setItem('poop_cache_daily', newDaily);
                 localStorage.setItem('poop_cache_eternal', newEternal);
 
-                // Invia a DB
                 await _supabase.from(TABLE_NAME).insert({});
                 
-                // Animazione bottone
-                btn.style.transform = "scale(0.9)";
-                setTimeout(() => btn.style.transform = "scale(1)", 150);
+                btn.style.transform = "scale(0.9) rotate(-10deg)";
+                setTimeout(() => btn.style.transform = "scale(1) rotate(0deg)", 150);
 
             } else {
                 // BLOCKED
                 soundError.currentTime = 0;
                 soundError.play();
                 
-                // Shake animation
                 btn.style.transform = "translateX(10px)";
                 setTimeout(() => btn.style.transform = "translateX(-10px)", 100);
                 setTimeout(() => btn.style.transform = "translateX(0)", 200);
@@ -302,11 +337,9 @@
         });
 
         // --- INIZIALIZZAZIONE ---
-        initDisplay();       // 1. Mostra cache o trattini
-        fetchCounts();       // 2. Scarica dati veri
-        subscribeToClicks(); // 3. Attiva realtime
-        
-        // Polling di sicurezza ogni 60 secondi
+        initDisplay();
+        fetchCounts();
+        subscribeToClicks();
         setInterval(fetchCounts, 60000);
 
     </script>
