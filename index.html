@@ -8,23 +8,24 @@
     <style>
         /* --- CSS STYLING --- */
         :root {
-            /* Nuovi colori "Rosa e Panna" */
-            --bg-pink: #ffdde1;
-            --bg-cream: #fff5e6;
-            --text-color: #5a3a3a; /* Testo marrone scuro per contrasto */
-            /* Vetro più chiaro per lo sfondo chiaro */
-            --glass: rgba(255, 255, 255, 0.5);
-            --glass-border: rgba(255, 255, 255, 0.8);
+            /* Colori adattati al nuovo sfondo */
+            --glass: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 240, 245, 1);
+            --text-color: #5a3a3a;
         }
 
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
-            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', 'Arial', cursive, sans-serif; /* Font più giocoso */
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', 'Arial', cursive, sans-serif;
             overflow: hidden;
             color: var(--text-color);
-            background: linear-gradient(to bottom, var(--bg-pink), var(--bg-cream));
+            /* --- SFONDO PERSONALIZZATO --- */
+            background-image: url('sfondo_poop.png');
+            background-repeat: repeat;
+            background-size: 400px auto; /* Aggiusta se necessario */
+            background-color: #ffe4e1; /* Fallback color */
         }
 
         .container {
@@ -35,121 +36,77 @@
             height: 100%;
             text-align: center;
             padding: 20px;
+            /* Leggero blur per staccare il contenuto dallo sfondo */
+            backdrop-filter: blur(3px);
         }
 
-        /* Hero Image sulla Landing Page */
-        .hero-image {
-            max-width: 250px;
-            height: auto;
-            margin-bottom: 30px;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));
-            border-radius: 20px;
-        }
-
-        /* --- IL FUMETTO E IL BOTTONE --- */
-        .button-wrapper {
-            position: relative;
-            margin: 40px 0;
-        }
-
-        /* Stile del Fumetto */
-        .speech-bubble {
-            position: absolute;
-            top: -90px; /* Posizione sopra la cacca */
-            left: 50%;
-            transform: translateX(-50%);
-            background: #ffffff;
-            border: 4px solid #000;
-            border-radius: 25px;
-            padding: 15px 25px;
-            font-weight: bold;
-            font-size: 1.5rem;
-            white-space: nowrap;
-            z-index: 10;
-            box-shadow: 5px 5px 0 rgba(0,0,0,0.2);
-            color: #000;
-        }
-        
-        /* La "codina" del fumetto */
-        .speech-bubble:after, .speech-bubble:before {
-            top: 100%;
-            left: 50%;
-            border: solid transparent;
-            content: " ";
-            height: 0;
-            width: 0;
-            position: absolute;
-            pointer-events: none;
-        }
-        .speech-bubble:after {
-            border-color: rgba(255, 255, 255, 0);
-            border-top-color: #ffffff;
-            border-width: 15px;
-            margin-left: -15px;
-        }
-        .speech-bubble:before {
-            border-color: rgba(0, 0, 0, 0);
-            border-top-color: #000000;
-            border-width: 21px;
-            margin-left: -21px;
-        }
-
-        /* The Button */
+        /* --- IL BOTTONE E L'IMMAGINE --- */
+        /* Il bottone ora è invisibile e copre l'immagine per catturare il click */
         .poop-btn {
-            font-size: 9rem; /* Un po' più grande */
             background: none;
             border: none;
             cursor: pointer;
+            padding: 0;
+            position: relative; /* Necessario per z-index */
+            z-index: 10; /* Sta sopra l'immagine */
+        }
+
+        /* L'immagine della Poopoo */
+        #hero-poop {
+            max-width: 300px; /* Dimensione dell'immagine */
+            height: auto;
+            display: block; /* Rimuove spazi indesiderati */
             transition: transform 0.1s ease, filter 0.2s;
-            user-select: none;
-            /* Ombra più morbida per lo sfondo chiaro */
+            /* Ombra morbida */
             filter: drop-shadow(0 10px 20px rgba(90, 58, 58, 0.3));
         }
 
-        .poop-btn:active {
-            transform: scale(0.9) rotate(-5deg);
+        /* Effetti al click sul bottone (che si riflettono sull'immagine) */
+        .poop-btn:active #hero-poop {
+            transform: scale(0.95) rotate(-3deg);
         }
 
-        .poop-btn:hover {
-            transform: scale(1.1) rotate(5deg);
+        .poop-btn:hover #hero-poop {
+            transform: scale(1.05) rotate(3deg);
         }
+
 
         /* Counters container */
         .stats-box {
-            margin-top: 30px;
+            margin-top: 40px;
             display: flex;
-            gap: 20px;
+            gap: 30px;
         }
 
         .counter-card {
             background: var(--glass);
-            backdrop-filter: blur(10px);
-            border: 2px solid var(--glass-border);
+            border: 3px solid var(--glass-border);
             padding: 15px 25px;
-            border-radius: 15px;
-            min-width: 120px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+            min-width: 130px;
+            box-shadow: 0 8px 32px rgba(90, 58, 58, 0.1);
         }
 
         .counter-card h3 {
             margin: 0 0 5px 0;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            opacity: 0.7;
+            opacity: 0.8;
+            font-weight: bold;
         }
 
         .count-val {
             font-size: 1.8rem;
             font-weight: 900;
-            color: #333;
+            color: var(--text-color);
         }
 
         /* Toast Notification */
         #toast {
             visibility: hidden;
             min-width: 250px;
-            background-color: #5a3a3a; /* Marrone */
+            background-color: #5a3a3a;
             color: #fff;
             text-align: center;
             border-radius: 10px;
@@ -159,6 +116,7 @@
             bottom: 30px;
             font-size: 17px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border: 2px solid #fff;
         }
 
         #toast.show {
@@ -173,12 +131,9 @@
 <body>
 
     <div class="container">
-        <img src="https://cdn-icons-png.flaticon.com/512/2530/2530819.png" alt="Cute toilet roll" class="hero-image">
-
-        <div class="button-wrapper">
-            <div class="speech-bubble">Click me to poopoo!</div>
-            <button id="the-button" class="poop-btn" title="Drop one">💩</button>
-        </div>
+        <button id="the-button" class="poop-btn" title="Drop one">
+            <img id="hero-poop" src="poop_angry.png" alt="Poop character">
+        </button>
 
         <div class="stats-box">
             <div class="counter-card">
@@ -199,12 +154,15 @@
 
     <script>
         // --- CONFIGURAZIONE ---
-        // LE TUE CREDENZIALI ORIGINALI
         const SUPABASE_URL = 'https://tiygrgsdcbplliehxogu.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_kPH335oqP4jqVf8hZUgWiw_i_1hgWJ7';
         
         const TABLE_NAME = 'clicks';
         const COOLDOWN_HOURS = 2;
+
+        // NOMI DEI FILE IMMAGINE
+        const IMG_ANGRY = 'poop_angry.png';
+        const IMG_RELAXED = 'poop_relaxed.png';
         
         // Inizializza Supabase
         const { createClient } = supabase;
@@ -212,6 +170,7 @@
 
         // Elementi DOM
         const btn = document.getElementById('the-button');
+        const heroImg = document.getElementById('hero-poop'); // L'immagine
         const dailyEl = document.getElementById('daily-count');
         const eternalEl = document.getElementById('eternal-count');
         const soundSuccess = document.getElementById('sound-success');
@@ -221,8 +180,52 @@
         // VARIABILE ANTI-DOPPIO CLICK
         let isMyClick = false;
 
-        // --- 1. DISPLAY IMMEDIATO (Cache Locale) ---
+        // --- FUNZIONI DI LOGICA ---
+
+        // Controlla il cooldown e restituisce true (se può cliccare) o i minuti rimanenti
+        function checkCooldown() {
+            const lastClickStr = localStorage.getItem('poop_last_click');
+            if (!lastClickStr) return true;
+
+            const lastClick = parseInt(lastClickStr);
+            const now = Date.now();
+            const diff = now - lastClick;
+            const cooldownMs = COOLDOWN_HOURS * 60 * 60 * 1000;
+
+            if (diff < cooldownMs) {
+                const remainingMin = Math.ceil((cooldownMs - diff) / 60000);
+                return remainingMin;
+            }
+            return true;
+        }
+
+        // Aggiorna l'immagine in base allo stato del cooldown
+        function updateHeroImage() {
+            const allowed = checkCooldown();
+            if (allowed === true) {
+                // Può fare -> Immagine Arrabbiata ("i gotta poopoo")
+                if (heroImg.src.indexOf(IMG_ANGRY) === -1) {
+                    heroImg.src = IMG_ANGRY;
+                }
+            } else {
+                // È in cooldown -> Immagine Rilassata ("Pooped")
+                if (heroImg.src.indexOf(IMG_RELAXED) === -1) {
+                    heroImg.src = IMG_RELAXED;
+                }
+            }
+        }
+
+        function showToast(message) {
+            toast.innerText = message;
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        // --- 1. DISPLAY IMMEDIATO (Cache Locale e Immagine) ---
         function initDisplay() {
+            // Aggiorna subito l'immagine corretta
+            updateHeroImage();
+
             const savedDaily = localStorage.getItem('poop_cache_daily');
             const savedEternal = localStorage.getItem('poop_cache_eternal');
             if (savedDaily) dailyEl.innerText = savedDaily;
@@ -231,12 +234,10 @@
 
         // --- 2. LOGICA DB (Fetch & Update) ---
         async function fetchCounts() {
-            // A. Eternal Count
             const { count: eternalCount, error: err1 } = await _supabase
                 .from(TABLE_NAME)
                 .select('*', { count: 'exact', head: true });
 
-            // B. Daily Count (Da mezzanotte UTC)
             const now = new Date();
             const startOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
             
@@ -255,7 +256,7 @@
             }
         }
 
-        // --- 3. REALTIME (Fix doppio conteggio integrato) ---
+        // --- 3. REALTIME ---
         function subscribeToClicks() {
             _supabase
                 .channel('public:clicks')
@@ -272,29 +273,7 @@
                 .subscribe();
         }
 
-        // --- 4. LOGICA CLICK ---
-        function checkCooldown() {
-            const lastClickStr = localStorage.getItem('poop_last_click');
-            if (!lastClickStr) return true;
-
-            const lastClick = parseInt(lastClickStr);
-            const now = Date.now();
-            const diff = now - lastClick;
-            const cooldownMs = COOLDOWN_HOURS * 60 * 60 * 1000;
-
-            if (diff < cooldownMs) {
-                const remainingMin = Math.ceil((cooldownMs - diff) / 60000);
-                return remainingMin;
-            }
-            return true;
-        }
-
-        function showToast(message) {
-            toast.innerText = message;
-            toast.className = "show";
-            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
-        }
-
+        // --- 4. EVENTO CLICK ---
         btn.addEventListener('click', async () => {
             const allowed = checkCooldown();
 
@@ -305,6 +284,9 @@
 
                 isMyClick = true;
                 setTimeout(() => { isMyClick = false; }, 2000);
+
+                // CAMBIA SUBITO L'IMMAGINE IN RILASSATA
+                heroImg.src = IMG_RELAXED;
 
                 const currentDailyVal = parseInt(dailyEl.innerText) || 0;
                 const currentEternalVal = parseInt(eternalEl.innerText) || 0;
@@ -320,27 +302,34 @@
 
                 await _supabase.from(TABLE_NAME).insert({});
                 
-                btn.style.transform = "scale(0.9) rotate(-10deg)";
-                setTimeout(() => btn.style.transform = "scale(1) rotate(0deg)", 150);
+                // Animazione immagine (tramite il bottone wrapper)
+                heroImg.style.transform = "scale(0.95) rotate(-5deg)";
+                setTimeout(() => heroImg.style.transform = "scale(1) rotate(0deg)", 150);
 
             } else {
                 // BLOCKED
                 soundError.currentTime = 0;
                 soundError.play();
                 
-                btn.style.transform = "translateX(10px)";
-                setTimeout(() => btn.style.transform = "translateX(-10px)", 100);
-                setTimeout(() => btn.style.transform = "translateX(0)", 200);
+                // Animazione "shake" sull'immagine
+                heroImg.style.transform = "translateX(10px)";
+                setTimeout(() => heroImg.style.transform = "translateX(-10px)", 100);
+                setTimeout(() => heroImg.style.transform = "translateX(0)", 200);
 
                 showToast(`Aspetta! Devi tenerla per altri ${allowed} minuti.`);
             }
         });
 
         // --- INIZIALIZZAZIONE ---
-        initDisplay();
-        fetchCounts();
-        subscribeToClicks();
-        setInterval(fetchCounts, 60000);
+        initDisplay();       // Imposta immagine e numeri dalla cache
+        fetchCounts();       // Scarica i dati freschi
+        subscribeToClicks(); // Attiva il realtime
+        
+        // Polling: controlla i contatori E lo stato dell'immagine ogni minuto
+        setInterval(() => {
+            fetchCounts();
+            updateHeroImage(); // Se il cooldown scade, l'immagine torna "arrabbiata"
+        }, 60000);
 
     </script>
 </body>
