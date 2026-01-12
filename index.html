@@ -184,7 +184,7 @@
 
     <div class="game-container">
         <button id="the-button" class="poop-btn" title="Drop one">
-            <img id="hero-poop" src="poop_angry.png" alt="Poop character">
+            <img id="hero-poop" src="poop_angry.jpg" alt="Poop character">
         </button>
 
         <div class="stats-box">
@@ -210,4 +210,188 @@
                 <tr>
                     <th style="width: 25%;">Frequency</th>
                     <th style="width: 25%;">What it might mean</th>
-                    <th>Quick Tip /
+                    <th>Quick Tip / Advice</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Less than 3 times a week</strong></td>
+                    <td>Likely Constipated (Slow transit)</td>
+                    <td>Drink significantly more water. Increase soluble fiber (oats, apples, beans). Get moving and exercise daily.</td>
+                </tr>
+                <tr>
+                    <td><strong>3 times a week to 3 times a day</strong></td>
+                    <td>The "Goldilocks" Zone (Normal Range)</td>
+                    <td>You are doing great! Keep up your current diet and hydration routine. Your gut is happy.</td>
+                </tr>
+                <tr>
+                    <td><strong>More than 3 times a day</strong></td>
+                    <td>Frequent / Fast Transit</td>
+                    <td>Stay hydrated to replace lost fluids. Watch for dietary triggers (spicy food, caffeine). If sudden or very loose, see a doc.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <audio id="sound-success" src="https://www.soundjay.com/misc/sounds/bubble-burst-1.mp3"></audio>
+    <audio id="sound-error" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+
+    <div id="toast">Wait! You must hold it in.</div>
+
+    <script>
+        // --- CONFIGURAZIONE ---
+        const SUPABASE_URL = 'https://tiygrgsdcbplliehxogu.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_kPH335oqP4jqVf8hZUgWiw_i_1hgWJ7';
+        
+        const TABLE_NAME = 'clicks';
+        const COOLDOWN_HOURS = 2;
+
+        // --- NOMI FILES (devono essere .jpg come nel codice HTML sopra) ---
+        const IMG_ANGRY = 'poop_angry.png';
+        const IMG_RELAXED = 'poop_relaxed.png';
+        
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const btn = document.getElementById('the-button');
+        const heroImg = document.getElementById('hero-poop');
+        const dailyEl = document.getElementById('daily-count');
+        const eternalEl = document.getElementById('eternal-count');
+        const soundSuccess = document.getElementById('sound-success');
+        const soundError = document.getElementById('sound-error');
+        const toast = document.getElementById('toast');
+
+        let isMyClick = false;
+
+        function checkCooldown() {
+            const lastClickStr = localStorage.getItem('poop_last_click');
+            if (!lastClickStr) return true;
+
+            const lastClick = parseInt(lastClickStr);
+            const now = Date.now();
+            const diff = now - lastClick;
+            const cooldownMs = COOLDOWN_HOURS * 60 * 60 * 1000;
+
+            if (diff < cooldownMs) {
+                const remainingMin = Math.ceil((cooldownMs - diff) / 60000);
+                return remainingMin;
+            }
+            return true;
+        }
+
+        function updateHeroImage() {
+            const allowed = checkCooldown();
+            const currentSrc = heroImg.getAttribute('src'); 
+
+            if (allowed === true) {
+                if (currentSrc !== IMG_ANGRY) heroImg.src = IMG_ANGRY;
+            } else {
+                if (currentSrc !== IMG_RELAXED) heroImg.src = IMG_RELAXED;
+            }
+        }
+
+        function showToast(message) {
+            toast.innerText = message;
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        function initDisplay() {
+            updateHeroImage();
+            const savedDaily = localStorage.getItem('poop_cache_daily');
+            const savedEternal = localStorage.getItem('poop_cache_eternal');
+            if (savedDaily) dailyEl.innerText = savedDaily;
+            if (savedEternal) eternalEl.innerText = savedEternal;
+        }
+
+        async function fetchCounts() {
+            const { count: eternalCount, error: err1 } = await _supabase
+                .from(TABLE_NAME)
+                .select('*', { count: 'exact', head: true });
+
+            const now = new Date();
+            const startOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+            
+            const { count: dailyCount, error: err2 } = await _supabase
+                .from(TABLE_NAME)
+                .select('*', { count: 'exact', head: true })
+                .gte('created_at', startOfDay.toISOString());
+
+            if (!err1 && eternalCount !== null) {
+                eternalEl.innerText = eternalCount;
+                localStorage.setItem('poop_cache_eternal', eternalCount);
+            }
+            if (!err2 && dailyCount !== null) {
+                dailyEl.innerText = dailyCount;
+                localStorage.setItem('poop_cache_daily', dailyCount);
+            }
+        }
+
+        function subscribeToClicks() {
+            _supabase
+                .channel('public:clicks')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: TABLE_NAME }, (payload) => {
+                    if (isMyClick) {
+                        isMyClick = false;
+                        return;
+                    }
+                    let currentEternal = parseInt(eternalEl.innerText) || 0;
+                    eternalEl.innerText = currentEternal + 1;
+                    let currentDaily = parseInt(dailyEl.innerText) || 0;
+                    dailyEl.innerText = currentDaily + 1;
+                })
+                .subscribe();
+        }
+
+        btn.addEventListener('click', async () => {
+            const allowed = checkCooldown();
+
+            if (allowed === true) {
+                soundSuccess.currentTime = 0;
+                soundSuccess.play();
+
+                isMyClick = true;
+                setTimeout(() => { isMyClick = false; }, 2000);
+
+                heroImg.src = IMG_RELAXED;
+
+                const currentDailyVal = parseInt(dailyEl.innerText) || 0;
+                const currentEternalVal = parseInt(eternalEl.innerText) || 0;
+                const newDaily = currentDailyVal + 1;
+                const newEternal = currentEternalVal + 1;
+                
+                dailyEl.innerText = newDaily;
+                eternalEl.innerText = newEternal;
+
+                localStorage.setItem('poop_last_click', Date.now().toString());
+                localStorage.setItem('poop_cache_daily', newDaily);
+                localStorage.setItem('poop_cache_eternal', newEternal);
+
+                await _supabase.from(TABLE_NAME).insert({});
+                
+                heroImg.style.transform = "scale(0.95) rotate(-5deg)";
+                setTimeout(() => heroImg.style.transform = "scale(1) rotate(0deg)", 150);
+
+            } else {
+                soundError.currentTime = 0;
+                soundError.play();
+                heroImg.style.transform = "translateX(10px)";
+                setTimeout(() => heroImg.style.transform = "translateX(-10px)", 100);
+                setTimeout(() => heroImg.style.transform = "translateX(0)", 200);
+                showToast(`Aspetta! Devi tenerla per altri ${allowed} minuti.`);
+            }
+        });
+
+        initDisplay();
+        fetchCounts();
+        subscribeToClicks();
+        
+        setInterval(() => {
+            fetchCounts();
+            updateHeroImage();
+        }, 60000);
+
+    </script>
+</body>
+</html>
