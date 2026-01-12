@@ -8,74 +8,79 @@
     <style>
         /* --- CSS STYLING --- */
         :root {
-            /* Colori adattati al nuovo sfondo */
-            --glass: rgba(255, 255, 255, 0.8);
-            --glass-border: rgba(255, 240, 245, 1);
+            --glass: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 1);
             --text-color: #5a3a3a;
+            --table-header-bg: rgba(90, 58, 58, 0.1);
         }
 
         body, html {
             margin: 0;
             padding: 0;
-            height: 100%;
+            /* MODIFICA PER SCORRIMENTO: min-height invece di height fissa */
+            min-height: 100%; 
             font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', 'Arial', cursive, sans-serif;
-            overflow: hidden;
+            /* MODIFICA PER SCORRIMENTO: permettiamo lo scroll verticale */
+            overflow-x: hidden; 
+            overflow-y: auto;
             color: var(--text-color);
-            /* --- SFONDO PERSONALIZZATO --- */
-            background-image: url('sfondo_poop.png');
+            
+            /* --- SFONDO --- */
+            background-color: #ffe4e1; 
+            background-image: url('sfondo_poop.jpg'); /* Assicurati sia .jpg */
             background-repeat: repeat;
-            background-size: 400px auto; /* Aggiusta se necessario */
-            background-color: #ffe4e1; /* Fallback color */
+            background-size: 400px auto;
         }
 
-        .container {
+        /* Container principale del gioco */
+        .game-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100%;
+            /* Altezza minima per occupare la prima schermata */
+            min-height: 90vh; 
             text-align: center;
             padding: 20px;
-            /* Leggero blur per staccare il contenuto dallo sfondo */
-            backdrop-filter: blur(3px);
+            /* MODIFICA SFONDO: Rimosso il blur per renderlo più nitido */
+            backdrop-filter: none; 
         }
 
         /* --- IL BOTTONE E L'IMMAGINE --- */
-        /* Il bottone ora è invisibile e copre l'immagine per catturare il click */
         .poop-btn {
             background: none;
             border: none;
             cursor: pointer;
             padding: 0;
-            position: relative; /* Necessario per z-index */
-            z-index: 10; /* Sta sopra l'immagine */
+            position: relative;
+            z-index: 10;
         }
 
         /* L'immagine della Poopoo */
         #hero-poop {
-            max-width: 300px; /* Dimensione dell'immagine */
+            /* MODIFICA DIMENSIONE: Aumentata a 380px */
+            max-width: 380px; 
             height: auto;
-            display: block; /* Rimuove spazi indesiderati */
+            display: block;
             transition: transform 0.1s ease, filter 0.2s;
-            /* Ombra morbida */
-            filter: drop-shadow(0 10px 20px rgba(90, 58, 58, 0.3));
+            filter: drop-shadow(0 15px 25px rgba(90, 58, 58, 0.25));
+        }
+        
+        /* Fallback stile */
+        #hero-poop:after {
+            content: "⚠️ Rinomina le tue immagini in .jpg";
+            display: block; font-size: 14px; color: red; background: white; padding: 10px; border: 2px dashed red;
         }
 
-        /* Effetti al click sul bottone (che si riflettono sull'immagine) */
-        .poop-btn:active #hero-poop {
-            transform: scale(0.95) rotate(-3deg);
-        }
-
-        .poop-btn:hover #hero-poop {
-            transform: scale(1.05) rotate(3deg);
-        }
-
+        .poop-btn:active #hero-poop { transform: scale(0.95) rotate(-3deg); }
+        .poop-btn:hover #hero-poop { transform: scale(1.05) rotate(3deg); }
 
         /* Counters container */
         .stats-box {
-            margin-top: 40px;
+            margin-top: 30px;
             display: flex;
-            gap: 30px;
+            gap: 20px;
+            margin-bottom: 40px; /* Spazio extra sotto */
         }
 
         .counter-card {
@@ -89,7 +94,7 @@
 
         .counter-card h3 {
             margin: 0 0 5px 0;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             opacity: 0.8;
@@ -102,37 +107,84 @@
             color: var(--text-color);
         }
 
+        /* --- NUOVA SEZIONE TABELLA --- */
+        .advice-section {
+            padding: 50px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            /* Sfondo semitrasparente per staccare dal pattern */
+            background: rgba(255, 245, 240, 0.6);
+            border-top: 3px solid var(--glass-border);
+        }
+
+        .advice-section h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .disclaimer {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 30px;
+        }
+
+        /* Stile della Tabella */
+        .advice-table {
+            width: 95%;
+            max-width: 900px;
+            border-collapse: separate; /* Necessario per border-radius */
+            border-spacing: 0;
+            background: var(--glass);
+            border: 3px solid var(--glass-border);
+            border-radius: 20px; /* Angoli arrotondati per tutta la tabella */
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(90, 58, 58, 0.1);
+        }
+
+        .advice-table th, .advice-table td {
+            padding: 18px 15px;
+            text-align: left;
+            border-bottom: 2px solid rgba(90, 58, 58, 0.1);
+        }
+
+        .advice-table th {
+            background-color: var(--table-header-bg);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        /* Rimuovi bordo dall'ultima riga */
+        .advice-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* Responsive tabella per cellulari */
+        @media (max-width: 600px) {
+            .advice-table th, .advice-table td {
+                padding: 12px 10px;
+                font-size: 0.9rem;
+            }
+             #hero-poop { max-width: 300px; } /* Un po' meno grande su mobile */
+        }
+
         /* Toast Notification */
         #toast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: #5a3a3a;
-            color: #fff;
-            text-align: center;
-            border-radius: 10px;
-            padding: 16px;
-            position: fixed;
-            z-index: 100;
-            bottom: 30px;
-            font-size: 17px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            border: 2px solid #fff;
+            visibility: hidden; min-width: 250px; background-color: #5a3a3a; color: #fff; text-align: center; border-radius: 10px; padding: 16px; position: fixed; z-index: 100; bottom: 30px; font-size: 16px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border: 2px solid #fff;
         }
-
-        #toast.show {
-            visibility: visible;
-            animation: fadein 0.5s, fadeout 0.5s 2.5s;
-        }
-
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
         @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div class="game-container">
         <button id="the-button" class="poop-btn" title="Drop one">
-            <img id="hero-poop" src="poop_angry.png" alt="Poop character">
+            <img id="hero-poop" src="poop_angry.jpg" alt="Poop character">
         </button>
 
         <div class="stats-box">
@@ -145,192 +197,17 @@
                 <div id="eternal-count" class="count-val">--</div>
             </div>
         </div>
+        
+        <p style="opacity: 0.7; margin-top: -20px;">↓ Scroll down for advice ↓</p>
     </div>
 
-    <audio id="sound-success" src="https://www.soundjay.com/misc/sounds/bubble-burst-1.mp3"></audio>
-    <audio id="sound-error" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
-
-    <div id="toast">Wait! You must hold it in.</div>
-
-    <script>
-        // --- CONFIGURAZIONE ---
-        const SUPABASE_URL = 'https://tiygrgsdcbplliehxogu.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_kPH335oqP4jqVf8hZUgWiw_i_1hgWJ7';
+    <div class="advice-section">
+        <h2>💩 Poop Frequency Guide 💩</h2>
+        <p class="disclaimer">(General information only. Not medical advice! Consult a doctor if concerned.)</p>
         
-        const TABLE_NAME = 'clicks';
-        const COOLDOWN_HOURS = 2;
-
-        // NOMI DEI FILE IMMAGINE
-        const IMG_ANGRY = 'poop_angry.png';
-        const IMG_RELAXED = 'poop_relaxed.png';
-        
-        // Inizializza Supabase
-        const { createClient } = supabase;
-        const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // Elementi DOM
-        const btn = document.getElementById('the-button');
-        const heroImg = document.getElementById('hero-poop'); // L'immagine
-        const dailyEl = document.getElementById('daily-count');
-        const eternalEl = document.getElementById('eternal-count');
-        const soundSuccess = document.getElementById('sound-success');
-        const soundError = document.getElementById('sound-error');
-        const toast = document.getElementById('toast');
-
-        // VARIABILE ANTI-DOPPIO CLICK
-        let isMyClick = false;
-
-        // --- FUNZIONI DI LOGICA ---
-
-        // Controlla il cooldown e restituisce true (se può cliccare) o i minuti rimanenti
-        function checkCooldown() {
-            const lastClickStr = localStorage.getItem('poop_last_click');
-            if (!lastClickStr) return true;
-
-            const lastClick = parseInt(lastClickStr);
-            const now = Date.now();
-            const diff = now - lastClick;
-            const cooldownMs = COOLDOWN_HOURS * 60 * 60 * 1000;
-
-            if (diff < cooldownMs) {
-                const remainingMin = Math.ceil((cooldownMs - diff) / 60000);
-                return remainingMin;
-            }
-            return true;
-        }
-
-        // Aggiorna l'immagine in base allo stato del cooldown
-        function updateHeroImage() {
-            const allowed = checkCooldown();
-            if (allowed === true) {
-                // Può fare -> Immagine Arrabbiata ("i gotta poopoo")
-                if (heroImg.src.indexOf(IMG_ANGRY) === -1) {
-                    heroImg.src = IMG_ANGRY;
-                }
-            } else {
-                // È in cooldown -> Immagine Rilassata ("Pooped")
-                if (heroImg.src.indexOf(IMG_RELAXED) === -1) {
-                    heroImg.src = IMG_RELAXED;
-                }
-            }
-        }
-
-        function showToast(message) {
-            toast.innerText = message;
-            toast.className = "show";
-            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
-        }
-
-        // --- 1. DISPLAY IMMEDIATO (Cache Locale e Immagine) ---
-        function initDisplay() {
-            // Aggiorna subito l'immagine corretta
-            updateHeroImage();
-
-            const savedDaily = localStorage.getItem('poop_cache_daily');
-            const savedEternal = localStorage.getItem('poop_cache_eternal');
-            if (savedDaily) dailyEl.innerText = savedDaily;
-            if (savedEternal) eternalEl.innerText = savedEternal;
-        }
-
-        // --- 2. LOGICA DB (Fetch & Update) ---
-        async function fetchCounts() {
-            const { count: eternalCount, error: err1 } = await _supabase
-                .from(TABLE_NAME)
-                .select('*', { count: 'exact', head: true });
-
-            const now = new Date();
-            const startOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-            
-            const { count: dailyCount, error: err2 } = await _supabase
-                .from(TABLE_NAME)
-                .select('*', { count: 'exact', head: true })
-                .gte('created_at', startOfDay.toISOString());
-
-            if (!err1 && eternalCount !== null) {
-                eternalEl.innerText = eternalCount;
-                localStorage.setItem('poop_cache_eternal', eternalCount);
-            }
-            if (!err2 && dailyCount !== null) {
-                dailyEl.innerText = dailyCount;
-                localStorage.setItem('poop_cache_daily', dailyCount);
-            }
-        }
-
-        // --- 3. REALTIME ---
-        function subscribeToClicks() {
-            _supabase
-                .channel('public:clicks')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: TABLE_NAME }, (payload) => {
-                    if (isMyClick) {
-                        isMyClick = false;
-                        return;
-                    }
-                    let currentEternal = parseInt(eternalEl.innerText) || 0;
-                    eternalEl.innerText = currentEternal + 1;
-                    let currentDaily = parseInt(dailyEl.innerText) || 0;
-                    dailyEl.innerText = currentDaily + 1;
-                })
-                .subscribe();
-        }
-
-        // --- 4. EVENTO CLICK ---
-        btn.addEventListener('click', async () => {
-            const allowed = checkCooldown();
-
-            if (allowed === true) {
-                // SUCCESS
-                soundSuccess.currentTime = 0;
-                soundSuccess.play();
-
-                isMyClick = true;
-                setTimeout(() => { isMyClick = false; }, 2000);
-
-                // CAMBIA SUBITO L'IMMAGINE IN RILASSATA
-                heroImg.src = IMG_RELAXED;
-
-                const currentDailyVal = parseInt(dailyEl.innerText) || 0;
-                const currentEternalVal = parseInt(eternalEl.innerText) || 0;
-                const newDaily = currentDailyVal + 1;
-                const newEternal = currentEternalVal + 1;
-                
-                dailyEl.innerText = newDaily;
-                eternalEl.innerText = newEternal;
-
-                localStorage.setItem('poop_last_click', Date.now().toString());
-                localStorage.setItem('poop_cache_daily', newDaily);
-                localStorage.setItem('poop_cache_eternal', newEternal);
-
-                await _supabase.from(TABLE_NAME).insert({});
-                
-                // Animazione immagine (tramite il bottone wrapper)
-                heroImg.style.transform = "scale(0.95) rotate(-5deg)";
-                setTimeout(() => heroImg.style.transform = "scale(1) rotate(0deg)", 150);
-
-            } else {
-                // BLOCKED
-                soundError.currentTime = 0;
-                soundError.play();
-                
-                // Animazione "shake" sull'immagine
-                heroImg.style.transform = "translateX(10px)";
-                setTimeout(() => heroImg.style.transform = "translateX(-10px)", 100);
-                setTimeout(() => heroImg.style.transform = "translateX(0)", 200);
-
-                showToast(`Aspetta! Devi tenerla per altri ${allowed} minuti.`);
-            }
-        });
-
-        // --- INIZIALIZZAZIONE ---
-        initDisplay();       // Imposta immagine e numeri dalla cache
-        fetchCounts();       // Scarica i dati freschi
-        subscribeToClicks(); // Attiva il realtime
-        
-        // Polling: controlla i contatori E lo stato dell'immagine ogni minuto
-        setInterval(() => {
-            fetchCounts();
-            updateHeroImage(); // Se il cooldown scade, l'immagine torna "arrabbiata"
-        }, 60000);
-
-    </script>
-</body>
-</html>
+        <table class="advice-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">Frequency</th>
+                    <th style="width: 25%;">What it might mean</th>
+                    <th>Quick Tip /
