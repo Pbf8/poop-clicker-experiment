@@ -10,24 +10,23 @@
         :root {
             --glass: rgba(255, 255, 255, 0.85);
             --glass-border: rgba(255, 255, 255, 1);
-            --text-color: #5a3a3a;
+            --text-color: #5a3a3a; /* Marrone scuro base */
+            --text-dark: #3e2723;   /* Marrone ancora più scuro per leggibilità */
             --table-header-bg: rgba(90, 58, 58, 0.1);
         }
 
         body, html {
             margin: 0;
             padding: 0;
-            /* MODIFICA PER SCORRIMENTO: min-height invece di height fissa */
             min-height: 100%; 
             font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', 'Arial', cursive, sans-serif;
-            /* MODIFICA PER SCORRIMENTO: permettiamo lo scroll verticale */
             overflow-x: hidden; 
             overflow-y: auto;
             color: var(--text-color);
             
             /* --- SFONDO --- */
             background-color: #ffe4e1; 
-            background-image: url('sfondo_poop.png'); /* Assicurati sia .jpg */
+            background-image: url('sfondo_poop.jpg'); 
             background-repeat: repeat;
             background-size: 400px auto;
         }
@@ -38,12 +37,20 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            /* Altezza minima per occupare la prima schermata */
-            min-height: 90vh; 
+            min-height: 95vh; /* Occupa quasi tutto lo schermo */
             text-align: center;
-            padding: 20px;
-            /* MODIFICA SFONDO: Rimosso il blur per renderlo più nitido */
-            backdrop-filter: none; 
+            padding: 20px 20px 0 20px;
+        }
+
+        /* --- STILE DEI TITOLI (Have you... today?) --- */
+        .main-title {
+            font-size: 3rem;
+            font-weight: 900;
+            margin: 5px 0; /* Poco margine per stare vicini all'immagine */
+            color: var(--text-color);
+            /* Ombra bianca per staccare dal pattern di sfondo */
+            text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.6); 
+            line-height: 1;
         }
 
         /* --- IL BOTTONE E L'IMMAGINE --- */
@@ -51,22 +58,20 @@
             background: none;
             border: none;
             cursor: pointer;
-            padding: 0;
+            padding: 10px 0; /* Un po' di aria sopra e sotto l'immagine */
             position: relative;
             z-index: 10;
         }
 
         /* L'immagine della Poopoo */
         #hero-poop {
-            /* MODIFICA DIMENSIONE: Aumentata a 380px */
-            max-width: 380px; 
+            max-width: 350px; /* Leggermente ridotta per far stare i testi */
             height: auto;
             display: block;
             transition: transform 0.1s ease, filter 0.2s;
             filter: drop-shadow(0 15px 25px rgba(90, 58, 58, 0.25));
         }
         
-        /* Fallback stile */
         #hero-poop:after {
             content: "⚠️ Rinomina le tue immagini in .jpg";
             display: block; font-size: 14px; color: red; background: white; padding: 10px; border: 2px dashed red;
@@ -77,10 +82,10 @@
 
         /* Counters container */
         .stats-box {
-            margin-top: 30px;
+            margin-top: 20px;
             display: flex;
             gap: 20px;
-            margin-bottom: 40px; /* Spazio extra sotto */
+            margin-bottom: 20px;
         }
 
         .counter-card {
@@ -92,13 +97,17 @@
             box-shadow: 0 8px 32px rgba(90, 58, 58, 0.1);
         }
 
+        /* --- SOTTOTITOLI MIGLIORATI --- */
         .counter-card h3 {
             margin: 0 0 5px 0;
-            font-size: 0.8rem;
+            font-size: 0.9rem; /* Leggermente più grandi */
             text-transform: uppercase;
             letter-spacing: 1px;
-            opacity: 0.8;
-            font-weight: bold;
+            opacity: 1; /* Rimossa trasparenza per massima leggibilità */
+            color: var(--text-dark); /* Colore più scuro */
+            font-weight: 900; /* Più grassetto */
+            /* Sottile ombra bianca per contrasto */
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
         }
 
         .count-val {
@@ -107,38 +116,38 @@
             color: var(--text-color);
         }
 
-        /* --- NUOVA SEZIONE TABELLA --- */
+        /* --- SEZIONE TABELLA --- */
         .advice-section {
             padding: 50px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
-            /* Sfondo semitrasparente per staccare dal pattern */
-            background: rgba(255, 245, 240, 0.6);
+            background: rgba(255, 245, 240, 0.7);
             border-top: 3px solid var(--glass-border);
         }
 
         .advice-section h2 {
             font-size: 2rem;
             margin-bottom: 10px;
+            text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.6);
         }
         
         .disclaimer {
             font-size: 0.9rem;
-            opacity: 0.7;
+            opacity: 0.8;
             margin-bottom: 30px;
+            font-weight: bold;
         }
 
-        /* Stile della Tabella */
         .advice-table {
             width: 95%;
             max-width: 900px;
-            border-collapse: separate; /* Necessario per border-radius */
+            border-collapse: separate;
             border-spacing: 0;
             background: var(--glass);
             border: 3px solid var(--glass-border);
-            border-radius: 20px; /* Angoli arrotondati per tutta la tabella */
+            border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(90, 58, 58, 0.1);
         }
@@ -151,24 +160,20 @@
 
         .advice-table th {
             background-color: var(--table-header-bg);
-            font-weight: bold;
+            font-weight: 900;
+            color: var(--text-dark);
             text-transform: uppercase;
             letter-spacing: 1px;
             font-size: 0.9rem;
         }
 
-        /* Rimuovi bordo dall'ultima riga */
-        .advice-table tr:last-child td {
-            border-bottom: none;
-        }
+        .advice-table tr:last-child td { border-bottom: none; }
         
-        /* Responsive tabella per cellulari */
+        /* Media Query Mobile */
         @media (max-width: 600px) {
-            .advice-table th, .advice-table td {
-                padding: 12px 10px;
-                font-size: 0.9rem;
-            }
-             #hero-poop { max-width: 300px; } /* Un po' meno grande su mobile */
+            .main-title { font-size: 2.5rem; } /* Titoli un po' più piccoli su mobile */
+            #hero-poop { max-width: 280px; }
+            .advice-table th, .advice-table td { padding: 12px 10px; font-size: 0.9rem; }
         }
 
         /* Toast Notification */
@@ -183,9 +188,14 @@
 <body>
 
     <div class="game-container">
+        
+        <h1 class="main-title">Have you</h1>
+
         <button id="the-button" class="poop-btn" title="Drop one">
             <img id="hero-poop" src="poop_angry.jpg" alt="Poop character">
         </button>
+
+        <h1 class="main-title">today?</h1>
 
         <div class="stats-box">
             <div class="counter-card">
@@ -198,7 +208,7 @@
             </div>
         </div>
         
-        <p style="opacity: 0.7; margin-top: -20px;">↓ Scroll down for advice ↓</p>
+        <p style="opacity: 0.7; font-weight: bold; margin-bottom: 20px;">↓ Scroll down for advice ↓</p>
     </div>
 
     <div class="advice-section">
@@ -233,7 +243,6 @@
         </table>
     </div>
 
-
     <audio id="sound-success" src="https://www.soundjay.com/misc/sounds/bubble-burst-1.mp3"></audio>
     <audio id="sound-error" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
 
@@ -247,9 +256,8 @@
         const TABLE_NAME = 'clicks';
         const COOLDOWN_HOURS = 2;
 
-        // --- NOMI FILES (devono essere .jpg come nel codice HTML sopra) ---
-        const IMG_ANGRY = 'poop_angry.png';
-        const IMG_RELAXED = 'poop_relaxed.png';
+        const IMG_ANGRY = 'poop_angry.jpg';
+        const IMG_RELAXED = 'poop_relaxed.jpg';
         
         const { createClient } = supabase;
         const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
