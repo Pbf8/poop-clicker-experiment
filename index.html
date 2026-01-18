@@ -13,7 +13,8 @@
             --text-color: #5a3a3a;
             --text-dark: #3e2723;
             --table-header-bg: rgba(90, 58, 58, 0.1);
-            --calendar-active: #8d6e63; /* Colore per i giorni attivi */
+            --calendar-active: #8d6e63;
+            --badge-color: #ff4757;
         }
 
         body, html {
@@ -92,13 +93,13 @@
             border: 3px solid var(--glass-border);
             padding: 15px 25px;
             border-radius: 20px;
-            min-width: 130px;
+            min-width: 140px;
             box-shadow: 0 8px 32px rgba(90, 58, 58, 0.1);
         }
 
         .counter-card h3 {
             margin: 0 0 5px 0;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             opacity: 1;
@@ -112,17 +113,34 @@
             font-weight: 900;
             color: var(--text-color);
         }
+        
+        /* --- SCRITTA SCROLL PIÙ LEGGIBILE --- */
+        .scroll-hint {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            opacity: 1;
+            text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.7);
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-5px);}
+            60% {transform: translateY(-3px);}
+        }
 
         /* --- SEZIONE INFERIORE GENERALE --- */
         .bottom-section {
-            padding: 40px 20px;
+            padding: 40px 20px 20px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
             background: rgba(255, 245, 240, 0.7);
             border-top: 3px solid var(--glass-border);
-            gap: 50px; /* Spazio tra calendario e consigli */
+            gap: 50px; 
         }
 
         .section-title {
@@ -184,29 +202,42 @@
             background: rgba(255,255,255,0.3);
             position: relative;
         }
-
         .cal-day.empty { background: transparent; }
-
+        
         .cal-day.has-poop {
             background-color: #fff;
             border: 2px solid var(--text-color);
             font-weight: bold;
         }
-
-        /* L'emoji della cacca nel calendario */
+        
         .cal-day.has-poop::after {
             content: '💩';
             position: absolute;
             font-size: 1.2rem;
+            z-index: 1;
         }
         
-        /* Nascondiamo il numero se c'è la cacca per pulizia visiva? 
-           O lo teniamo? Teniamolo piccolo in alto a sinistra o sovrapposto.
-           Facciamo che l'emoji copre il numero per essere più divertente */
-        .cal-day.has-poop span {
-            display: none;
-        }
+        .cal-day.has-poop span.day-num { display: none; }
 
+        /* --- BADGE CONTATORE --- */
+        .poop-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--badge-color);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 2px solid #fff;
+            z-index: 2;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
 
         /* --- TABELLA CONSIGLI --- */
         .advice-table {
@@ -237,6 +268,21 @@
         }
 
         .advice-table tr:last-child td { border-bottom: none; }
+
+        /* --- FOOTER COPYRIGHT --- */
+        .site-footer {
+            width: 100%;
+            margin-top: 30px;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-dark);
+            opacity: 0.8;
+            background: rgba(90, 58, 58, 0.05);
+            border-top: 1px solid rgba(90, 58, 58, 0.1);
+        }
+        
+        .site-footer p { margin: 5px 0; }
         
         /* Responsive */
         @media (max-width: 600px) {
@@ -263,20 +309,20 @@
             <img id="hero-poop" src="poop_angry.png" alt="Poop character">
         </button>
 
-        <h1 class="main-title">today?</h1>
+        <h1 class="main-title" id="title-today">today?</h1>
 
         <div class="stats-box">
             <div class="counter-card">
-                <h3>Global Today</h3>
+                <h3>World poops today</h3>
                 <div id="daily-count" class="count-val">--</div>
             </div>
             <div class="counter-card">
-                <h3>Eternal Total</h3>
+                <h3>All time poops</h3>
                 <div id="eternal-count" class="count-val">--</div>
             </div>
         </div>
         
-        <p style="opacity: 0.7; font-weight: bold; margin-bottom: 20px;">↓ Scroll for Tracker & Advice ↓</p>
+        <p class="scroll-hint">↓ Scroll for Tracker & Advice ↓</p>
     </div>
 
     <div class="bottom-section">
@@ -326,6 +372,16 @@
                 </tbody>
             </table>
         </div>
+        
+        <footer class="site-footer">
+            <p>
+                &copy; <span id="copyright-year">2026</span> <strong>The Daily Drop</strong>. All rights reserved.
+            </p>
+            <p style="font-size: 0.75rem; margin-top: 8px;">
+                Made with 💩 and ❤️ for healthy guts.
+            </p>
+        </footer>
+
     </div>
 
     <audio id="sound-success" src="https://www.soundjay.com/misc/sounds/bubble-burst-1.mp3"></audio>
@@ -348,6 +404,7 @@
         // DOM Elements
         const btn = document.getElementById('the-button');
         const heroImg = document.getElementById('hero-poop');
+        const titleToday = document.getElementById('title-today'); // <-- Nuovo riferimento
         const dailyEl = document.getElementById('daily-count');
         const eternalEl = document.getElementById('eternal-count');
         const soundSuccess = document.getElementById('sound-success');
@@ -357,36 +414,42 @@
         const monthLabel = document.getElementById('month-year-label');
 
         let isMyClick = false;
+        
+        // Footer Year
+        document.getElementById('copyright-year').innerText = new Date().getFullYear();
 
-        // --- CALENDAR LOGIC ---
+        // --- CALENDAR LOGIC (CON BADGE) ---
         let currentYear = new Date().getFullYear();
         let currentMonth = new Date().getMonth();
 
-        // Carica la storia dei click dal LocalStorage
         function getHistory() {
             const hist = localStorage.getItem('poop_history');
             return hist ? JSON.parse(hist) : [];
         }
 
-        // Salva un nuovo click nella storia
         function saveToHistory() {
             const history = getHistory();
-            const now = new Date().getTime(); // Salva timestamp
+            const now = new Date().getTime();
             history.push(now);
             localStorage.setItem('poop_history', JSON.stringify(history));
-            renderCalendar(currentYear, currentMonth); // Aggiorna il calendario
+            renderCalendar(currentYear, currentMonth);
         }
 
-        // Renderizza il calendario
         function renderCalendar(year, month) {
             const history = getHistory();
-            // Converti history in un Set di stringhe "YYYY-MM-DD" per ricerca veloce
-            const historySet = new Set(history.map(ts => {
+            const dayCounts = {};
+            
+            history.forEach(ts => {
                 const d = new Date(ts);
-                return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-            }));
+                const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+                if (dayCounts[key]) {
+                    dayCounts[key]++;
+                } else {
+                    dayCounts[key] = 1;
+                }
+            });
 
-            const firstDay = new Date(year, month, 1).getDay(); // 0 = Sunday
+            const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -394,7 +457,6 @@
 
             calGrid.innerHTML = "";
 
-            // Header Giorni
             const daysShort = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
             daysShort.forEach(d => {
                 const cell = document.createElement("div");
@@ -403,32 +465,33 @@
                 calGrid.appendChild(cell);
             });
 
-            // Celle vuote prima del primo giorno
             for (let i = 0; i < firstDay; i++) {
                 const cell = document.createElement("div");
                 cell.className = "cal-day empty";
                 calGrid.appendChild(cell);
             }
 
-            // Giorni del mese
             for (let d = 1; d <= daysInMonth; d++) {
                 const cell = document.createElement("div");
                 cell.className = "cal-day";
-                
-                // Crea la chiave per verificare se c'è poop
                 const dateKey = `${year}-${month}-${d}`;
                 
-                if (historySet.has(dateKey)) {
+                if (dayCounts[dateKey] && dayCounts[dateKey] > 0) {
+                    const count = dayCounts[dateKey];
                     cell.classList.add("has-poop");
-                    // Se c'è la cacca, il numero è nascosto dal CSS (display:none su span)
-                    // ma lo mettiamo comunque nel DOM
-                    cell.innerHTML = `<span>${d}</span>`; 
-                    cell.title = "Good job!";
+                    cell.innerHTML = `<span class="day-num">${d}</span>`;
+                    
+                    if (count > 1) {
+                        const badge = document.createElement("div");
+                        badge.className = "poop-badge";
+                        badge.innerText = count;
+                        cell.appendChild(badge);
+                    }
+                    cell.title = `You went ${count} time(s)!`;
                 } else {
-                    cell.innerText = d;
+                    cell.innerHTML = `<span class="day-num">${d}</span>`;
                 }
 
-                // Evidenzia oggi
                 const today = new Date();
                 if (d === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
                     cell.style.border = "2px dashed #5a3a3a";
@@ -469,13 +532,19 @@
             return true;
         }
 
+        // --- Aggiornato per cambiare anche il testo ---
         function updateHeroImage() {
             const allowed = checkCooldown();
             const currentSrc = heroImg.getAttribute('src'); 
+
             if (allowed === true) {
+                // Può farla -> Immagine Arrabbiata, Testo Domanda
                 if (currentSrc !== IMG_ANGRY) heroImg.src = IMG_ANGRY;
+                titleToday.innerText = "today?";
             } else {
+                // In cooldown -> Immagine Rilassata, Testo Esclamativo
                 if (currentSrc !== IMG_RELAXED) heroImg.src = IMG_RELAXED;
+                titleToday.innerText = "today!";
             }
         }
 
@@ -487,7 +556,7 @@
 
         function initDisplay() {
             updateHeroImage();
-            renderCalendar(currentYear, currentMonth); // Init Calendario
+            renderCalendar(currentYear, currentMonth);
             const savedDaily = localStorage.getItem('poop_cache_daily');
             const savedEternal = localStorage.getItem('poop_cache_eternal');
             if (savedDaily) dailyEl.innerText = savedDaily;
@@ -543,7 +612,9 @@
                 isMyClick = true;
                 setTimeout(() => { isMyClick = false; }, 2000);
 
+                // CAMBIO DI STATO
                 heroImg.src = IMG_RELAXED;
+                titleToday.innerText = "today!"; // Cambio immediato testo
 
                 const currentDailyVal = parseInt(dailyEl.innerText) || 0;
                 const currentEternalVal = parseInt(eternalEl.innerText) || 0;
@@ -553,11 +624,10 @@
                 dailyEl.innerText = newDaily;
                 eternalEl.innerText = newEternal;
 
-                // UPDATE CACHE & HISTORY
                 localStorage.setItem('poop_last_click', Date.now().toString());
                 localStorage.setItem('poop_cache_daily', newDaily);
                 localStorage.setItem('poop_cache_eternal', newEternal);
-                saveToHistory(); // <--- SALVA NEL CALENDARIO
+                saveToHistory();
 
                 await _supabase.from(TABLE_NAME).insert({});
                 
@@ -570,7 +640,8 @@
                 heroImg.style.transform = "translateX(10px)";
                 setTimeout(() => heroImg.style.transform = "translateX(-10px)", 100);
                 setTimeout(() => heroImg.style.transform = "translateX(0)", 200);
-                showToast(`Aspetta! Devi tenerla per altri ${allowed} minuti.`);
+                
+                showToast(`Wait Champ! 🏆 You are going too fast! 😂`);
             }
         });
 
