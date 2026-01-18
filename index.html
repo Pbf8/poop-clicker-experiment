@@ -84,22 +84,28 @@
         .stats-box {
             margin-top: 20px;
             display: flex;
-            gap: 20px;
+            gap: 15px; /* Gap ridotto per far stare meglio le box */
             margin-bottom: 20px;
+            flex-wrap: wrap; /* Permette di andare a capo se lo schermo è minuscolo */
+            justify-content: center;
         }
 
         .counter-card {
             background: var(--glass);
             border: 3px solid var(--glass-border);
-            padding: 15px 25px;
+            padding: 10px 15px; /* Padding ridotto per mobile */
             border-radius: 20px;
-            min-width: 140px;
+            min-width: 110px; /* Larghezza minima ridotta */
             box-shadow: 0 8px 32px rgba(90, 58, 58, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .counter-card h3 {
             margin: 0 0 5px 0;
-            font-size: 0.85rem;
+            font-size: 0.8rem; /* Font leggermente più piccolo */
             text-transform: uppercase;
             letter-spacing: 1px;
             opacity: 1;
@@ -109,9 +115,18 @@
         }
 
         .count-val {
-            font-size: 1.8rem;
+            font-size: 1.6rem; /* Font leggermente più piccolo */
             font-weight: 900;
             color: var(--text-color);
+            line-height: 1.2;
+        }
+        
+        /* Stile per la data "Since..." */
+        .since-label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-top: 5px;
+            font-weight: bold;
         }
         
         /* --- SCRITTA SCROLL PIÙ LEGGIBILE --- */
@@ -319,6 +334,7 @@
             <div class="counter-card">
                 <h3>All time poops</h3>
                 <div id="eternal-count" class="count-val">--</div>
+                <div class="since-label">(since 18/01/2026)</div>
             </div>
         </div>
         
