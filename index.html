@@ -384,7 +384,7 @@
 
     </div>
 
-    <audio id="sound-success" src="https://www.soundjay.com/misc/sounds/bubble-burst-1.mp3"></audio>
+    <audio id="sound-success" src="https://www.soundjay.com/human/sounds/fart-01.mp3"></audio>
     <audio id="sound-error" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
 
     <div id="toast">Wait! You must hold it in.</div>
@@ -404,7 +404,7 @@
         // DOM Elements
         const btn = document.getElementById('the-button');
         const heroImg = document.getElementById('hero-poop');
-        const titleToday = document.getElementById('title-today'); // <-- Nuovo riferimento
+        const titleToday = document.getElementById('title-today');
         const dailyEl = document.getElementById('daily-count');
         const eternalEl = document.getElementById('eternal-count');
         const soundSuccess = document.getElementById('sound-success');
@@ -415,7 +415,6 @@
 
         let isMyClick = false;
         
-        // Footer Year
         document.getElementById('copyright-year').innerText = new Date().getFullYear();
 
         // --- CALENDAR LOGIC (CON BADGE) ---
@@ -513,6 +512,20 @@
             renderCalendar(currentYear, currentMonth);
         }
 
+        // --- FUNZIONE PER LA SINTESI VOCALE (VOCINA DOLCE) ---
+        function speakMessage(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Stop precedenti
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US'; 
+                // Pitch 1.5 - 1.8 fa sembrare la voce molto "kawaii" / cartone animato
+                utterance.pitch = 1.6;    
+                utterance.rate = 1.2;     
+                
+                window.speechSynthesis.speak(utterance);
+            }
+        }
 
         // --- MAIN LOGIC ---
 
@@ -532,17 +545,14 @@
             return true;
         }
 
-        // --- Aggiornato per cambiare anche il testo ---
         function updateHeroImage() {
             const allowed = checkCooldown();
             const currentSrc = heroImg.getAttribute('src'); 
 
             if (allowed === true) {
-                // Può farla -> Immagine Arrabbiata, Testo Domanda
                 if (currentSrc !== IMG_ANGRY) heroImg.src = IMG_ANGRY;
                 titleToday.innerText = "today?";
             } else {
-                // In cooldown -> Immagine Rilassata, Testo Esclamativo
                 if (currentSrc !== IMG_RELAXED) heroImg.src = IMG_RELAXED;
                 titleToday.innerText = "today!";
             }
@@ -606,15 +616,15 @@
             const allowed = checkCooldown();
 
             if (allowed === true) {
+                // SUCCESS
                 soundSuccess.currentTime = 0;
-                soundSuccess.play();
+                soundSuccess.play(); 
 
                 isMyClick = true;
                 setTimeout(() => { isMyClick = false; }, 2000);
 
-                // CAMBIO DI STATO
                 heroImg.src = IMG_RELAXED;
-                titleToday.innerText = "today!"; // Cambio immediato testo
+                titleToday.innerText = "today!";
 
                 const currentDailyVal = parseInt(dailyEl.innerText) || 0;
                 const currentEternalVal = parseInt(eternalEl.innerText) || 0;
@@ -635,13 +645,17 @@
                 setTimeout(() => heroImg.style.transform = "scale(1) rotate(0deg)", 150);
 
             } else {
+                // FAIL (Cooldown)
                 soundError.currentTime = 0;
                 soundError.play();
                 heroImg.style.transform = "translateX(10px)";
                 setTimeout(() => heroImg.style.transform = "translateX(-10px)", 100);
                 setTimeout(() => heroImg.style.transform = "translateX(0)", 200);
                 
-                showToast(`Wait Champ! 🏆 You are going too fast! 😂`);
+                // MESSAGGIO VOCINA DOLCE
+                const msg = `Uh-oh! Too much poo poo!`;
+                speakMessage(msg); 
+                showToast(`Slow down, Champ! 🏆 You are killin'it! 😂`);
             }
         });
 
