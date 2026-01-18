@@ -520,8 +520,8 @@
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'en-US'; 
                 // Pitch 1.5 - 1.8 fa sembrare la voce molto "kawaii" / cartone animato
-                utterance.pitch = 1.6;    
-                utterance.rate = 1.2;     
+                utterance.pitch = 1.4;    
+                utterance.rate = 0.5;     
                 
                 window.speechSynthesis.speak(utterance);
             }
@@ -653,7 +653,7 @@
                 setTimeout(() => heroImg.style.transform = "translateX(0)", 200);
                 
                 // MESSAGGIO VOCINA DOLCE
-                const msg = `Uh-oh! Too much poo poo!`;
+                const msg = `oo-oo! Too much poo poo!`;
                 speakMessage(msg); 
                 showToast(`Slow down, Champ! 🏆 You are killin'it! 😂`);
             }
