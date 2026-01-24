@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Daily Drop 💩</title>
+    <meta name="description" content="The funniest global poop tracker. Join thousands of people tracking their daily drop in real-time. Have you pooped today?">
+    <meta name="keywords" content="poop tracker, daily drop, gut health, funny website, habit tracker">
+    <meta name="author" content="The Daily Drop">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://haveyoupooptoday.com/">
+    <meta property="og:title" content="Have you 💩 today?">
+    <meta property="og:description" content="Track your daily drop and join the global counter! Don't break the streak.">
+    <meta property="og:image" content="https://haveyoupooptoday.com/poop_angry.png">
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* --- CSS STYLING --- */
@@ -84,18 +94,18 @@
         .stats-box {
             margin-top: 20px;
             display: flex;
-            gap: 15px; /* Gap ridotto per far stare meglio le box */
+            gap: 15px; 
             margin-bottom: 20px;
-            flex-wrap: wrap; /* Permette di andare a capo se lo schermo è minuscolo */
+            flex-wrap: wrap; 
             justify-content: center;
         }
 
         .counter-card {
             background: var(--glass);
             border: 3px solid var(--glass-border);
-            padding: 10px 15px; /* Padding ridotto per mobile */
+            padding: 10px 15px; 
             border-radius: 20px;
-            min-width: 110px; /* Larghezza minima ridotta */
+            min-width: 110px; 
             box-shadow: 0 8px 32px rgba(90, 58, 58, 0.1);
             display: flex;
             flex-direction: column;
@@ -105,7 +115,7 @@
 
         .counter-card h3 {
             margin: 0 0 5px 0;
-            font-size: 0.8rem; /* Font leggermente più piccolo */
+            font-size: 0.8rem; 
             text-transform: uppercase;
             letter-spacing: 1px;
             opacity: 1;
@@ -115,7 +125,7 @@
         }
 
         .count-val {
-            font-size: 1.6rem; /* Font leggermente più piccolo */
+            font-size: 1.6rem; 
             font-weight: 900;
             color: var(--text-color);
             line-height: 1.2;
@@ -283,6 +293,34 @@
         }
 
         .advice-table tr:last-child td { border-bottom: none; }
+        
+        /* STILE PER LINK AMAZON */
+        .amazon-link {
+            color: #d35400; /* Un colore arancio/mattone che si nota ma sta bene */
+            font-weight: bold;
+            text-decoration: underline;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .amazon-link:hover { color: #e67e22; }
+
+        /* STILE PER BOTTONE COFFEE */
+        .coffee-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: #FFDD00; /* Giallo tipico di BuyMeACoffee */
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+            border: 2px solid #fff; /* Bordo bianco per staccare dallo sfondo rosa */
+        }
+        .coffee-btn:active { transform: scale(0.95); }
+        .coffee-btn:hover { transform: scale(1.05); }
 
         /* --- FOOTER COPYRIGHT --- */
         .site-footer {
@@ -373,7 +411,10 @@
                     <tr>
                         <td><strong>< 3 times/week</strong></td>
                         <td>Slow transit</td>
-                        <td>Drink more water & eat oats/apples. Move your body!</td>
+                        <td>
+                            Drink more water & eat oats/apples. Move your body! <br>
+                            <a href="https://amzn.to/3LUFtOh" target="_blank" class="amazon-link">Try a Toilet Stool (Game Changer!) 🚽</a>
+                        </td>
                     </tr>
                     <tr>
                         <td><strong>3/week to 3/day</strong></td>
@@ -390,9 +431,19 @@
         </div>
         
         <footer class="site-footer">
-            <p>
+            
+            <a href="https://buymeacoffee.com/ihavetopoop" target="_blank" class="coffee-btn">
+                ☕ Help me to poop: Buy me a coffee
+            </a>
+            
+            <p style="margin-top: 20px;">
                 &copy; <span id="copyright-year">2026</span> <strong>The Daily Drop</strong>. All rights reserved.
             </p>
+            
+            <p style="font-size: 0.65rem; opacity: 0.6; margin-top: 5px;">
+                As an Amazon Associate, I earn from qualifying purchases.
+            </p>
+
             <p style="font-size: 0.75rem; margin-top: 8px;">
                 Made with 💩 and ❤️ for healthy guts.
             </p>
@@ -531,7 +582,7 @@
         // --- FUNZIONE PER LA SINTESI VOCALE (VOCINA DOLCE) ---
         function speakMessage(text) {
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); // Stop precedenti
+                window.speechSynthesis.cancel(); 
                 
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'en-US'; 
